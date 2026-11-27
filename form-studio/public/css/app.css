@@ -36,3 +36,6 @@ form.inline input{width:auto}
 .timeline li{display:flex;gap:16px}.timeline .time{flex:0 0 80px;font-weight:700;color:var(--orange);font-variant-numeric:tabular-nums}
 .timeline small{color:var(--green)}
 @media print{.no-print,.topbar{display:none!important}body{background:#fff}.page{padding:0}}
+.topbar nav{display:flex;gap:16px;align-items:center}
+.linkbtn{background:none;border:0;color:#fff;font:inherit;cursor:pointer;opacity:.85}
+.form label.check{flex-direction:row;align-items:center;font-weight:400}.form label.check input{width:auto}

@@ -10,6 +10,7 @@ Espace de préparation pédagogique de la solution **Indé’Form** : construire
 - [x] Duplication d’un module avec ses séances et étapes (copie indépendante)
 - [x] Notes après la séance
 - [x] Vue pour animer (imprimable)
+- [x] Comptes (inscription, connexion) et isolation des données : un compte = un espace de travail
 - [ ] Supports et exercices (fichiers ou liens)
 - [ ] Réordonner séances et étapes, modifier une étape
 - [ ] Lien avec Form’Pilot (ouvrir la fiche depuis une intervention)
@@ -23,5 +24,7 @@ touch database/database.sqlite && php artisan migrate
 php artisan serve
 php artisan test
 ```
+
+Déploiement sur hébergement mutualisé : voir `../docs/deploiement-planethoster.md`.
 
 Laravel 12, SQLite, Blade. Charte : orange `#F19224`, vert `#0A9650`, anthracite `#121416`.

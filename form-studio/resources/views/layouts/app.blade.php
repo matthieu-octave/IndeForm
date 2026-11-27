@@ -9,7 +9,13 @@
 <body>
 <header class="topbar no-print">
     <a class="brand" href="{{ route('modules.index') }}">Form’Studio <small>une solution Indé’Form</small></a>
-    <nav><a href="{{ route('modules.index') }}">Bibliothèque</a></nav>
+    <nav>
+        @auth
+            <a href="{{ route('modules.index') }}">Bibliothèque</a>
+            <form method="post" action="{{ route('logout') }}" class="inline">@csrf
+                <button class="linkbtn">{{ auth()->user()->name }} · Se déconnecter</button></form>
+        @endauth
+    </nav>
 </header>
 <main class="page">
     @if (session('status'))

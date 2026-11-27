@@ -22,7 +22,13 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'workspace_id',
     ];
+
+    public function workspace(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Workspace::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.

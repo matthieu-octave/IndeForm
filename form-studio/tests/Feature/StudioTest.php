@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\CourseModule;
 use App\Models\SessionStep;
 use App\Models\TeachingSession;
+use App\Models\User;
 use App\Support\Duration;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -13,6 +14,20 @@ class StudioTest extends TestCase
 {
     use RefreshDatabase;
 
+    private User $user;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->user = User::factory()->create();
+        $this->actingAs($this->user);
+    }
+
+    private function module(array $attrs = []): CourseModule
+    {
+        return CourseModule::factory()->create($attrs + ['workspace_id' => $this->user->workspace_id]);
+    }
+
     public function test_module_can_be_created_and_found_by_reference_title_or_keyword(): void
     {
         $this->post('/modules', [
@@ -20,7 +35,7 @@ class StudioTest extends TestCase
             'reference' => 'BC01-UA03',
             'keywords' => 'php, ports',
         ])->assertRedirect();
-        CourseModule::factory()->create(['title' => 'Excel avancé']);
+        $this->module(['title' => 'Excel avancé']);
 
         foreach (['hexagonale', 'BC01', 'ports'] as $term) {
             $this->get('/modules?q='.$term)->assertSee('Architecture hexagonale')->assertDontSee('Excel avancé');
@@ -34,7 +49,7 @@ class StudioTest extends TestCase
 
     public function test_steps_are_ordered_and_total_duration_is_computed(): void
     {
-        $module = CourseModule::factory()->create();
+        $module = $this->module();
         $this->post("/modules/{$module->id}/sessions", ['title' => 'Séance 1'])->assertRedirect();
         $session = $module->sessions()->first();
 
@@ -49,7 +64,7 @@ class StudioTest extends TestCase
 
     public function test_duplicate_is_independent_from_the_original(): void
     {
-        $module = CourseModule::factory()->create(['title' => 'Hexagonale', 'reference' => 'BC01-UA03']);
+        $module = $this->module(['title' => 'Hexagonale', 'reference' => 'BC01-UA03']);
         $session = TeachingSession::factory()->for($module, 'module')->create(['notes' => 'note perso']);
         SessionStep::factory()->for($session, 'session')->create(['title' => 'TP', 'minutes' => 60]);
 
@@ -67,7 +82,7 @@ class StudioTest extends TestCase
 
     public function test_post_session_notes_are_saved(): void
     {
-        $session = TeachingSession::factory()->create();
+        $session = TeachingSession::factory()->for($this->module(), 'module')->create();
         $this->put("/sessions/{$session->id}", ['notes' => 'TP +45 min'])->assertRedirect();
         $this->assertSame('TP +45 min', $session->fresh()->notes);
     }
