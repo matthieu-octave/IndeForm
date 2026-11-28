@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseModuleController;
 use App\Http\Controllers\ResourceController;
@@ -18,6 +19,12 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('deconnexion', [AuthController::class, 'logout'])->name('logout');
     Route::redirect('/', '/modules');
+
+    Route::get('compte', [AccountController::class, 'show'])->name('account.show');
+    Route::put('compte/profil', [AccountController::class, 'updateProfile'])->name('account.profile');
+    Route::put('compte/mot-de-passe', [AccountController::class, 'updatePassword'])->name('account.password')->middleware('throttle:6,1');
+    Route::get('compte/export', [AccountController::class, 'export'])->name('account.export');
+    Route::delete('compte', [AccountController::class, 'destroy'])->name('account.destroy')->middleware('throttle:6,1');
 
     Route::post('modules/import', [CourseModuleController::class, 'import'])->name('modules.import');
     Route::get('modules/{module}/export', [CourseModuleController::class, 'export'])->name('modules.export');
