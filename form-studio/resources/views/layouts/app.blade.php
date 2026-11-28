@@ -31,5 +31,10 @@
     @endif
     @yield('content')
 </main>
+<footer class="footer no-print">
+    <span>Form’Studio · {{ config('studio.publisher.trade_name') }}</span>
+    <a href="{{ route('legal.notice') }}">Mentions légales</a>
+    <a href="{{ route('legal.privacy') }}">Confidentialité</a>
+</footer>
 </body>
 </html>
