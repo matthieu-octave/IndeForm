@@ -1,0 +1,90 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Actions\CreateAccount;
+use App\Models\AuditLog;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\View\View;
+
+class AuthController extends Controller
+{
+    /** Inscription ouverte à tous, sur invitation (code), ou fermée. */
+    public static function registrationAvailable(): bool
+    {
+        return config('compte.registration_open') || config('compte.invite_code') !== null;
+    }
+
+    public function showRegister(): View
+    {
+        abort_unless(self::registrationAvailable(), 404);
+
+        return view('auth.register', ['needsCode' => ! config('compte.registration_open')]);
+    }
+
+    public function register(Request $request, CreateAccount $createAccount): RedirectResponse
+    {
+        abort_unless(self::registrationAvailable(), 404);
+
+        $rules = [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'confirmed', Password::defaults()],
+        ];
+        if (! config('compte.registration_open')) {
+            $rules['invite_code'] = ['required', 'string', function ($attribute, $value, $fail) {
+                if (! hash_equals((string) config('compte.invite_code'), (string) $value)) {
+                    $fail('Code d’invitation incorrect.');
+                }
+            }];
+        }
+        $data = $request->validate($rules);
+
+        $user = $createAccount($data['name'], $data['email'], $data['password']);
+        event(new Registered($user)); // envoie l'e-mail de vérification
+
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect()->route('verification.notice');
+    }
+
+    public function showLogin(): View
+    {
+        return view('auth.login');
+    }
+
+    public function login(Request $request): RedirectResponse
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
+
+        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+            AuditLog::record('login.failed');
+
+            return back()->withErrors(['email' => 'Identifiants incorrects.'])->onlyInput('email');
+        }
+
+        $request->session()->regenerate();
+        $user = $request->user();
+        $user->forceFill(['last_login_at' => now()])->save();
+        AuditLog::record('login', $user);
+
+        return redirect()->intended(route('home'));
+    }
+
+    public function logout(Request $request): RedirectResponse
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
+    }
+}
