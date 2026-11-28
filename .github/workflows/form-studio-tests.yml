@@ -1,0 +1,30 @@
+name: Form'Studio – tests
+
+on:
+  pull_request:
+    paths: ['form-studio/**', '.github/workflows/form-studio-tests.yml']
+  push:
+    branches: [main]
+    paths: ['form-studio/**', '.github/workflows/form-studio-tests.yml']
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: form-studio
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo_sqlite, sqlite3
+          coverage: none
+      - name: Dépendances
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Configuration
+        run: cp .env.example .env && php artisan key:generate
+      - name: Style (Pint)
+        run: vendor/bin/pint --test
+      - name: Tests
+        run: php artisan test
