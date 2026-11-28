@@ -15,9 +15,13 @@ class WorkspaceIsolationTest extends TestCase
     use RefreshDatabase;
 
     private User $alice;
+
     private User $bob;
+
     private CourseModule $module;
+
     private TeachingSession $session;
+
     private SessionStep $step;
 
     protected function setUp(): void

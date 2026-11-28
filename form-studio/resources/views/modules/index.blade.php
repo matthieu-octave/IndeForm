@@ -23,4 +23,11 @@
     <p class="muted">{{ $q ? 'Aucun module ne correspond à la recherche.' : 'Aucun module pour le moment. Créez le premier pour commencer.' }}</p>
 @endforelse
 </div>
+@if ($modules->hasPages())
+<nav class="pager actions" aria-label="Pagination">
+    @if ($modules->onFirstPage())<span class="btn" aria-disabled="true">← Précédent</span>@else<a class="btn" href="{{ $modules->previousPageUrl() }}">← Précédent</a>@endif
+    <span class="muted">Page {{ $modules->currentPage() }} sur {{ $modules->lastPage() }}</span>
+    @if ($modules->hasMorePages())<a class="btn" href="{{ $modules->nextPageUrl() }}">Suivant →</a>@else<span class="btn" aria-disabled="true">Suivant →</span>@endif
+</nav>
+@endif
 @endsection

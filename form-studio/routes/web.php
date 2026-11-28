@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseModuleController;
+use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SessionStepController;
 use App\Http\Controllers\TeachingSessionController;
 use Illuminate\Support\Facades\Route;
@@ -23,8 +24,16 @@ Route::middleware('auth')->group(function () {
     Route::post('modules/{module}/sessions', [TeachingSessionController::class, 'store'])->name('sessions.store');
     Route::put('sessions/{session}', [TeachingSessionController::class, 'update'])->name('sessions.update');
     Route::delete('sessions/{session}', [TeachingSessionController::class, 'destroy'])->name('sessions.destroy');
+    Route::post('sessions/{session}/move', [TeachingSessionController::class, 'move'])->name('sessions.move');
+    Route::post('sessions/{session}/duplicate', [TeachingSessionController::class, 'duplicate'])->name('sessions.duplicate');
     Route::get('sessions/{session}/animer', [TeachingSessionController::class, 'present'])->name('sessions.present');
 
     Route::post('sessions/{session}/steps', [SessionStepController::class, 'store'])->name('steps.store');
+    Route::post('modules/{module}/resources', [ResourceController::class, 'store'])->name('resources.store');
+    Route::put('resources/{resource}', [ResourceController::class, 'update'])->name('resources.update');
+    Route::delete('resources/{resource}', [ResourceController::class, 'destroy'])->name('resources.destroy');
+
+    Route::put('steps/{step}', [SessionStepController::class, 'update'])->name('steps.update');
+    Route::post('steps/{step}/move', [SessionStepController::class, 'move'])->name('steps.move');
     Route::delete('steps/{step}', [SessionStepController::class, 'destroy'])->name('steps.destroy');
 });

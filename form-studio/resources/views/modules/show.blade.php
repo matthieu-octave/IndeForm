@@ -28,12 +28,23 @@
 </div>
 @endif
 
+<section class="panel" id="ressources">
+    <h2>Supports et exercices du module</h2>
+    @include('resources._list', ['resources' => $module->resources->whereNull('teaching_session_id')])
+    @include('resources._form', ['sessionId' => null])
+</section>
+
 @foreach ($module->sessions as $session)
-<section class="panel">
+<section class="panel" id="seance-{{ $session->id }}">
     <div class="head">
         <h2>Séance {{ $loop->iteration }} — {{ $session->title }}
             <span class="tag muted">{{ \App\Support\Duration::format($session->steps->sum('minutes')) }}</span></h2>
         <div class="actions">
+            <form method="post" action="{{ route('sessions.move', $session) }}" class="inline">
+                @csrf
+                <button class="btn small" name="direction" value="up" @disabled($loop->first) aria-label="Monter la séance" title="Monter">↑</button>
+                <button class="btn small" name="direction" value="down" @disabled($loop->last) aria-label="Descendre la séance" title="Descendre">↓</button>
+            </form>
             <a class="btn" href="{{ route('sessions.present', $session) }}">Vue pour animer</a>
             <form method="post" action="{{ route('sessions.destroy', $session) }}" class="inline" onsubmit="return confirm('Supprimer cette séance ?')">
                 @csrf @method('delete')
@@ -43,17 +54,54 @@
     </div>
     @if ($session->objectives)<p class="pre">{{ $session->objectives }}</p>@endif
 
+    <details class="edit">
+        <summary>Modifier ou copier la séance</summary>
+        <form class="form" method="post" action="{{ route('sessions.update', $session) }}">
+            @csrf @method('put')
+            <label>Intitulé *<input name="title" value="{{ $session->title }}" required></label>
+            <label>Objectifs de la séance<textarea name="objectives" rows="2">{{ $session->objectives }}</textarea></label>
+            <div class="actions"><button class="btn small primary">Enregistrer</button></div>
+        </form>
+        <form class="inline" method="post" action="{{ route('sessions.duplicate', $session) }}">
+            @csrf
+            <select name="course_module_id" aria-label="Module de destination">
+                <option value="">Dans ce module</option>
+                @foreach ($otherModules as $other)
+                    <option value="{{ $other->id }}">Vers « {{ $other->title }} »</option>
+                @endforeach
+            </select>
+            <button class="btn small">Copier la séance</button>
+        </form>
+    </details>
+
     <ol class="steps">
     @forelse ($session->steps as $step)
         <li>
-            <div>
+            <div class="grow">
                 <strong>{{ $step->title }}</strong> <span class="tag muted">{{ \App\Support\Duration::format($step->minutes) }}</span>
                 @if ($step->instructions)<p class="pre">{{ $step->instructions }}</p>@endif
+                <details class="edit">
+                    <summary>Modifier</summary>
+                    <form class="form inline-form" method="post" action="{{ route('steps.update', $step) }}">
+                        @csrf @method('put')
+                        <input name="title" value="{{ $step->title }}" required aria-label="Intitulé de l’étape">
+                        <input name="minutes" type="number" min="0" max="1440" value="{{ $step->minutes }}" required aria-label="Minutes">
+                        <textarea name="instructions" rows="2" aria-label="Consignes" placeholder="Consignes">{{ $step->instructions }}</textarea>
+                        <button class="btn small primary">Enregistrer</button>
+                    </form>
+                </details>
             </div>
-            <form method="post" action="{{ route('steps.destroy', $step) }}">
-                @csrf @method('delete')
-                <button class="btn small danger" aria-label="Supprimer l’étape">×</button>
-            </form>
+            <div class="step-actions">
+                <form method="post" action="{{ route('steps.move', $step) }}" class="inline">
+                    @csrf
+                    <button class="btn small" name="direction" value="up" @disabled($loop->first) aria-label="Monter l’étape" title="Monter">↑</button>
+                    <button class="btn small" name="direction" value="down" @disabled($loop->last) aria-label="Descendre l’étape" title="Descendre">↓</button>
+                </form>
+                <form method="post" action="{{ route('steps.destroy', $step) }}" class="inline">
+                    @csrf @method('delete')
+                    <button class="btn small danger" aria-label="Supprimer l’étape" title="Supprimer">×</button>
+                </form>
+            </div>
         </li>
     @empty
         <li class="muted">Aucune étape : ajoutez le déroulé ci-dessous.</li>
@@ -67,6 +115,12 @@
         <input name="instructions" placeholder="Consignes (facultatif)">
         <button class="btn">Ajouter l’étape</button>
     </form>
+
+    <div class="resources-block">
+        <h3>Supports et exercices de la séance</h3>
+        @include('resources._list', ['resources' => $module->resources->where('teaching_session_id', $session->id)])
+        @include('resources._form', ['sessionId' => $session->id])
+    </div>
 
     <form class="form notes" method="post" action="{{ route('sessions.update', $session) }}">
         @csrf @method('put')

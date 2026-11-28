@@ -21,6 +21,12 @@
     @if (session('status'))
         <div class="flash no-print">{{ session('status') }}</div>
     @endif
+    @if ($errors->any() && ! request()->routeIs('login', 'register', 'modules.create', 'modules.edit'))
+        <div class="flash error-box no-print" role="alert">
+            <strong>Impossible d’enregistrer :</strong>
+            <ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+        </div>
+    @endif
     @yield('content')
 </main>
 </body>

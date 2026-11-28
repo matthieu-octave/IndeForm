@@ -19,6 +19,17 @@ class CourseModule extends Model
         return $this->hasMany(TeachingSession::class)->orderBy('position')->orderBy('id');
     }
 
+    public function resources(): HasMany
+    {
+        return $this->hasMany(Resource::class)->orderBy('position')->orderBy('id');
+    }
+
+    /** Liens rattachés au module lui-même (pas à une séance). */
+    public function moduleResources(): HasMany
+    {
+        return $this->resources()->whereNull('teaching_session_id');
+    }
+
     public function scopeSearch(Builder $query, ?string $term): Builder
     {
         $term = trim((string) $term);
@@ -46,14 +57,22 @@ class CourseModule extends Model
         $copy->duplicated_from_id = $this->id;
         $copy->save();
 
+        $sessionMap = [];
         foreach ($this->sessions()->with('steps')->get() as $session) {
             $newSession = $session->replicate(['created_at', 'updated_at']);
             $newSession->course_module_id = $copy->id;
             $newSession->notes = null;
             $newSession->save();
+            $sessionMap[$session->id] = $newSession->id;
             foreach ($session->steps as $step) {
                 $newSession->steps()->create($step->only(['position', 'title', 'minutes', 'instructions']));
             }
+        }
+
+        foreach ($this->resources as $resource) {
+            $copy->resources()->create($resource->only(['type', 'title', 'url', 'position']) + [
+                'teaching_session_id' => $sessionMap[$resource->teaching_session_id] ?? null,
+            ]);
         }
 
         return $copy;
