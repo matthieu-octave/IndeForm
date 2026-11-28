@@ -66,3 +66,8 @@ Tâche cron à ajouter dans N0C (chaque nuit à 3 h) :
 ```
 Tester une fois à la main : `bash ~/apps/form-studio-src/form-studio/backup.sh`.
 Restaurer : `gunzip -c ~/backups/form-studio/FICHIER.sql.gz | mysql -u UTILISATEUR -p NOM_DE_LA_BASE`.
+
+## Sécurité
+- Dans le `.env` de production : `SESSION_SECURE_COOKIE=true` (cookies envoyés en HTTPS uniquement), puis `php artisan config:cache`.
+- L'application envoie ses propres en-têtes de sécurité (CSP, X-Frame-Options, HSTS en HTTPS).
+- Les tests tournent automatiquement sur GitHub (onglet Actions) à chaque pull request.
