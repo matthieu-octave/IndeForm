@@ -19,6 +19,12 @@
     <label>Confirmer le mot de passe
         <input type="password" name="password_confirmation" required autocomplete="new-password">
     </label>
+    @if ($needsCode)
+    <label>Code d’invitation
+        <input name="invite_code" value="{{ old('invite_code') }}" required autocomplete="off">
+        @error('invite_code')<span class="error">{{ $message }}</span>@enderror
+    </label>
+    @endif
     <div class="actions">
         <button class="btn primary">Créer mon compte</button>
         <a href="{{ route('login') }}">J’ai déjà un compte</a>

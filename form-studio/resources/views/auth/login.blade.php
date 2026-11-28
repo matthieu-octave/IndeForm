@@ -14,7 +14,9 @@
     <label class="check"><input type="checkbox" name="remember" value="1"> Rester connecté</label>
     <div class="actions">
         <button class="btn primary">Se connecter</button>
-        <a href="{{ route('register') }}">Créer un compte</a>
+        @if (\App\Http\Controllers\AuthController::registrationAvailable())
+            <a href="{{ route('register') }}">Créer un compte</a>
+        @endif
     </div>
 </form>
 @endsection
