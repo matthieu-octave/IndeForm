@@ -13,8 +13,9 @@
         @auth
             <a href="{{ route('modules.index') }}">Bibliothèque</a>
             <a href="{{ route('templates.index') }}">Modèles de séance</a>
+            <a href="{{ route('account.show') }}">{{ auth()->user()->name }}</a>
             <form method="post" action="{{ route('logout') }}" class="inline">@csrf
-                <button class="linkbtn">{{ auth()->user()->name }} · Se déconnecter</button></form>
+                <button class="linkbtn">Se déconnecter</button></form>
         @endauth
     </nav>
 </header>

@@ -72,3 +72,4 @@ details.template[open] > .steps,details.template[open] > .actions{margin-top:10p
 @media print{@page{size:A4;margin:15mm}.present h1{font-size:1.5rem}.timeline{gap:10px}.timeline li{break-inside:avoid}.print-urls a::after{content:" — " attr(href);font-weight:400;font-size:.8rem;color:#555;word-break:break-all}}
 @media (max-width:600px){.timeline .time{flex-basis:56px}.head{flex-direction:column}.timer{gap:12px}}
 .tag.late{background:#fdecea;color:#b42318}
+.danger-zone{border-color:#f3c3be}
