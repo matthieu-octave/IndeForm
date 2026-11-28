@@ -76,3 +76,18 @@ details.template[open] > .steps,details.template[open] > .actions{margin-top:10p
 .legal h2{margin-top:8px}.legal p,.legal ul{margin:0}.legal li{margin-bottom:4px}
 .footer{max-width:960px;margin:0 auto;padding:0 var(--gap) var(--gap);display:flex;gap:16px;flex-wrap:wrap;font-size:.85rem;color:#6c757d}
 .footer a{color:inherit}
+/* Mobile */
+input,select,textarea{max-width:100%;min-width:0}
+form.inline{flex-wrap:wrap;max-width:100%}
+.topbar{flex-wrap:wrap}.topbar nav{flex-wrap:wrap}
+@media (max-width:640px){
+  .topbar{padding:10px 16px;gap:8px}.brand small{display:none}
+  .topbar nav{gap:12px;font-size:.9rem}
+  .page{padding:16px;gap:16px}.panel{padding:16px}
+  form.inline:has(input:not([type=hidden])){width:100%}form.inline input{flex:1 1 160px}
+  .step-actions{flex-direction:row}.resources li{align-items:flex-start}
+  .head .actions{width:100%}
+  .steps li{flex-direction:column}.step-actions{align-self:flex-end}
+  .compare th:nth-child(4),.compare td:nth-child(4){display:none}
+  .footer{padding:0 16px 16px}
+}
