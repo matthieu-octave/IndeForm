@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseModuleController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SessionStepController;
+use App\Http\Controllers\SessionTemplateController;
 use App\Http\Controllers\TeachingSessionController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +30,11 @@ Route::middleware('auth')->group(function () {
     Route::get('sessions/{session}/animer', [TeachingSessionController::class, 'present'])->name('sessions.present');
 
     Route::post('sessions/{session}/steps', [SessionStepController::class, 'store'])->name('steps.store');
+    Route::get('modeles', [SessionTemplateController::class, 'index'])->name('templates.index');
+    Route::put('modeles/{template}', [SessionTemplateController::class, 'update'])->name('templates.update');
+    Route::delete('modeles/{template}', [SessionTemplateController::class, 'destroy'])->name('templates.destroy');
+    Route::post('sessions/{session}/template', [SessionTemplateController::class, 'storeFromSession'])->name('templates.fromSession');
+
     Route::post('modules/{module}/resources', [ResourceController::class, 'store'])->name('resources.store');
     Route::put('resources/{resource}', [ResourceController::class, 'update'])->name('resources.update');
     Route::delete('resources/{resource}', [ResourceController::class, 'destroy'])->name('resources.destroy');

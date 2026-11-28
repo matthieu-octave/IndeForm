@@ -72,6 +72,11 @@
             </select>
             <button class="btn small">Copier la séance</button>
         </form>
+        <form class="inline" method="post" action="{{ route('templates.fromSession', $session) }}">
+            @csrf
+            <input name="name" value="{{ $session->title }}" required aria-label="Nom du modèle" size="30">
+            <button class="btn small">Enregistrer comme modèle</button>
+        </form>
     </details>
 
     <ol class="steps">
@@ -136,7 +141,16 @@
     <h2>Ajouter une séance</h2>
     <form class="form" method="post" action="{{ route('sessions.store', $module) }}">
         @csrf
-        <label>Intitulé *<input name="title" required></label>
+        <label>Partir d’un modèle (facultatif)
+            <select name="template_id">
+                <option value="">Séance vide</option>
+                @foreach ($templates as $template)
+                    <option value="{{ $template->id }}">{{ $template->name }} · {{ \App\Support\Duration::format($template->totalMinutes()) }}{{ $template->isProvided() ? '' : ' (mon modèle)' }}</option>
+                @endforeach
+            </select>
+            <span class="muted small">Le déroulé du modèle est copié : la séance reste ensuite indépendante. <a href="{{ route('templates.index') }}">Voir les modèles</a></span>
+        </label>
+        <label>Intitulé (obligatoire pour une séance vide, sinon nom du modèle)<input name="title"></label>
         <label>Objectifs de la séance<textarea name="objectives" rows="2"></textarea></label>
         <button class="btn primary">Ajouter la séance</button>
     </form>
