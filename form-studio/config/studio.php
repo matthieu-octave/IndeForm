@@ -24,7 +24,10 @@ return [
     'host' => [
         'name' => 'PlanetHoster inc.',
         'address' => '4416 Louis-B.-Mayer, Laval (Québec) H7P 0G1, Canada',
+        'phone' => '+33 1 76 60 41 43',
         'website' => 'https://www.planethoster.com',
+        // Lieu où les données sont stockées (offre N0C, centre de données de Paris).
+        'data_location' => 'en France (centre de données de Paris)',
     ],
 
     /* Durée de conservation des sauvegardes de la base (jours), voir backup.sh. */

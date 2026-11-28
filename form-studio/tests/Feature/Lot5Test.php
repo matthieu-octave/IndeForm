@@ -16,8 +16,8 @@ class Lot5Test extends TestCase
 
     public function test_legal_pages_are_public(): void
     {
-        $this->get('/mentions-legales')->assertOk()->assertSee('MO Web Dev')->assertSee('799 232 715 00026')->assertSee('PlanetHoster');
-        $this->get('/confidentialite')->assertOk()->assertSee('CNIL')->assertSee('14 jours');
+        $this->get('/mentions-legales')->assertOk()->assertSee('MO Web Dev')->assertSee('799 232 715 00026')->assertSee('PlanetHoster')->assertSee('+33 1 76 60 41 43')->assertSee('hébergées en France', false);
+        $this->get('/confidentialite')->assertOk()->assertSee('CNIL')->assertSee('14 jours')->assertSee('hébergées en France', false);
         $this->get('/connexion')->assertSee('Mentions légales')->assertSee('Mot de passe oublié');
     }
 
