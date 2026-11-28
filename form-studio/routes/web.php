@@ -19,6 +19,8 @@ Route::middleware('auth')->group(function () {
     Route::post('deconnexion', [AuthController::class, 'logout'])->name('logout');
     Route::redirect('/', '/modules');
 
+    Route::post('modules/import', [CourseModuleController::class, 'import'])->name('modules.import');
+    Route::get('modules/{module}/export', [CourseModuleController::class, 'export'])->name('modules.export');
     Route::resource('modules', CourseModuleController::class)->parameters(['modules' => 'module']);
     Route::post('modules/{module}/duplicate', [CourseModuleController::class, 'duplicate'])->name('modules.duplicate');
 
@@ -27,6 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('sessions/{session}', [TeachingSessionController::class, 'destroy'])->name('sessions.destroy');
     Route::post('sessions/{session}/move', [TeachingSessionController::class, 'move'])->name('sessions.move');
     Route::post('sessions/{session}/duplicate', [TeachingSessionController::class, 'duplicate'])->name('sessions.duplicate');
+    Route::put('sessions/{session}/reel', [TeachingSessionController::class, 'saveActuals'])->name('sessions.actuals');
     Route::get('sessions/{session}/animer', [TeachingSessionController::class, 'present'])->name('sessions.present');
 
     Route::post('sessions/{session}/steps', [SessionStepController::class, 'store'])->name('steps.store');

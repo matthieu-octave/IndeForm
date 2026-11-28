@@ -17,7 +17,7 @@ class SessionStep extends Model
         static::addGlobalScope(new ThroughParentScope('session'));
     }
 
-    protected $fillable = ['teaching_session_id', 'position', 'title', 'minutes', 'instructions'];
+    protected $fillable = ['teaching_session_id', 'position', 'title', 'minutes', 'actual_minutes', 'instructions'];
 
     public function session(): BelongsTo
     {

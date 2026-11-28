@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\CourseModule;
 use App\Models\SessionTemplate;
+use App\Support\ModuleExchange;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 class CourseModuleController extends Controller
 {
@@ -69,6 +72,31 @@ class CourseModuleController extends Controller
         $copy = $module->duplicate($data['title'] ?? null);
 
         return redirect()->route('modules.show', $copy)->with('status', 'Copie créée : elle évolue indépendamment de l’original.');
+    }
+
+    public function export(CourseModule $module): Response
+    {
+        $name = Str::slug(($module->reference ? $module->reference.'-' : '').$module->title) ?: 'module';
+
+        return response()->json(ModuleExchange::export($module), 200, [
+            'Content-Disposition' => 'attachment; filename="'.$name.'.formstudio.json"',
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    public function import(Request $request): RedirectResponse
+    {
+        $request->validate(['file' => ['required', 'file', 'max:1024']], [
+            'file.required' => 'Choisissez un fichier .json exporté depuis Form’Studio.',
+            'file.max' => 'Le fichier ne doit pas dépasser 1 Mo.',
+        ]);
+        $payload = json_decode((string) file_get_contents($request->file('file')->getRealPath()), true);
+        if (! is_array($payload)) {
+            return back()->withErrors(['file' => 'Ce fichier n’est pas un JSON valide.']);
+        }
+
+        $module = ModuleExchange::import($payload);
+
+        return redirect()->route('modules.show', $module)->with('status', 'Module importé dans votre bibliothèque.');
     }
 
     private function validated(Request $request): array

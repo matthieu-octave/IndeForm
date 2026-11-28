@@ -57,6 +57,17 @@ class TeachingSession extends Model
         return $this->hasMany(Resource::class)->orderBy('position')->orderBy('id');
     }
 
+    /** Total réel, si au moins une durée réelle est saisie (les étapes sans réel comptent pour leur prévu). */
+    public function actualTotalMinutes(): ?int
+    {
+        $steps = $this->relationLoaded('steps') ? $this->steps : $this->steps()->get();
+        if ($steps->whereNotNull('actual_minutes')->isEmpty()) {
+            return null;
+        }
+
+        return (int) $steps->sum(fn ($s) => $s->actual_minutes ?? $s->minutes);
+    }
+
     public function totalMinutes(): int
     {
         return (int) $this->steps()->sum('minutes');

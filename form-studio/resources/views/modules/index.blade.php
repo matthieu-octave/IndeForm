@@ -23,6 +23,14 @@
     <p class="muted">{{ $q ? 'Aucun module ne correspond à la recherche.' : 'Aucun module pour le moment. Créez le premier pour commencer.' }}</p>
 @endforelse
 </div>
+<details class="panel no-print">
+    <summary>Importer un module (fichier .json exporté depuis Form’Studio)</summary>
+    <form class="inline" method="post" action="{{ route('modules.import') }}" enctype="multipart/form-data">
+        @csrf
+        <input type="file" name="file" accept=".json,application/json" required>
+        <button class="btn">Importer</button>
+    </form>
+</details>
 @if ($modules->hasPages())
 <nav class="pager actions" aria-label="Pagination">
     @if ($modules->onFirstPage())<span class="btn" aria-disabled="true">← Précédent</span>@else<a class="btn" href="{{ $modules->previousPageUrl() }}">← Précédent</a>@endif
