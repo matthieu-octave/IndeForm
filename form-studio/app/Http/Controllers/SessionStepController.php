@@ -11,22 +11,49 @@ class SessionStepController extends Controller
 {
     public function store(Request $request, TeachingSession $session): RedirectResponse
     {
-        $data = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'minutes' => ['required', 'integer', 'min:0', 'max:1440'],
-            'instructions' => ['nullable', 'string'],
+        $session->steps()->create($this->validated($request) + [
+            'position' => SessionStep::nextPosition($session->id, 'teaching_session_id'),
         ]);
 
-        $session->steps()->create($data + ['position' => ((int) $session->steps()->max('position')) + 1]);
+        return $this->back($session, 'Étape ajoutée.');
+    }
 
-        return redirect()->route('modules.show', $session->course_module_id)->with('status', 'Étape ajoutée.');
+    public function update(Request $request, SessionStep $step): RedirectResponse
+    {
+        $step->update($this->validated($request));
+
+        return $this->back($step->session, 'Étape modifiée.');
+    }
+
+    public function move(Request $request, SessionStep $step): RedirectResponse
+    {
+        $direction = $request->validate(['direction' => ['required', 'in:up,down']])['direction'];
+        $step->move($direction === 'up' ? -1 : 1);
+
+        return $this->back($step->session);
     }
 
     public function destroy(SessionStep $step): RedirectResponse
     {
-        $moduleId = $step->session->course_module_id;
+        $session = $step->session;
         $step->delete();
 
-        return redirect()->route('modules.show', $moduleId)->with('status', 'Étape supprimée.');
+        return $this->back($session, 'Étape supprimée.');
+    }
+
+    private function validated(Request $request): array
+    {
+        return $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'minutes' => ['required', 'integer', 'min:0', 'max:1440'],
+            'instructions' => ['nullable', 'string'],
+        ]);
+    }
+
+    private function back(TeachingSession $session, ?string $status = null): RedirectResponse
+    {
+        $redirect = redirect()->to(route('modules.show', $session->course_module_id).'#seance-'.$session->id);
+
+        return $status ? $redirect->with('status', $status) : $redirect;
     }
 }

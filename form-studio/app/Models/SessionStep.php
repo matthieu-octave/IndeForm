@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasPosition;
 use App\Models\Scopes\ThroughParentScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SessionStep extends Model
 {
-    use HasFactory;
+    use HasFactory, HasPosition;
 
     protected static function booted(): void
     {
@@ -21,5 +22,10 @@ class SessionStep extends Model
     public function session(): BelongsTo
     {
         return $this->belongsTo(TeachingSession::class, 'teaching_session_id');
+    }
+
+    protected function positionParentKey(): string
+    {
+        return 'teaching_session_id';
     }
 }

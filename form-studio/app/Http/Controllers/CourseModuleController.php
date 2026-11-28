@@ -14,7 +14,8 @@ class CourseModuleController extends Controller
         $modules = CourseModule::search($request->query('q'))
             ->withCount('sessions')
             ->orderBy('title')
-            ->get();
+            ->paginate(20)
+            ->withQueryString();
 
         return view('modules.index', ['modules' => $modules, 'q' => $request->query('q')]);
     }
@@ -33,9 +34,12 @@ class CourseModuleController extends Controller
 
     public function show(CourseModule $module): View
     {
-        $module->load('sessions.steps');
+        $module->load('sessions.steps', 'resources');
 
-        return view('modules.show', ['module' => $module]);
+        return view('modules.show', [
+            'module' => $module,
+            'otherModules' => CourseModule::whereKeyNot($module->id)->orderBy('title')->get(['id', 'title']),
+        ]);
     }
 
     public function edit(CourseModule $module): View
