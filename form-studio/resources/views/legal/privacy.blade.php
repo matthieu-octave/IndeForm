@@ -25,6 +25,10 @@
     <p>Vos données ne sont ni vendues ni partagées. Seuls y accèdent l’éditeur, pour la maintenance, et l’hébergeur ({{ $h['name'] }}) en tant que sous-traitant technique.
         Chaque compte est isolé : un utilisateur ne voit jamais les contenus d’un autre.</p>
 
+    <h2>Lieu d’hébergement</h2>
+    <p>Vos données sont hébergées {{ $h['data_location'] }}, au sein de l’Union européenne. L’hébergeur est une société canadienne ; un éventuel accès de son support technique depuis le Canada
+        est encadré par la décision d’adéquation de la Commission européenne, qui reconnaît au Canada un niveau de protection des données équivalent.</p>
+
     <h2>Durée de conservation</h2>
     <p>Vos données sont conservées tant que votre compte existe. Si vous supprimez votre compte, elles sont effacées immédiatement de l’application,
         puis disparaissent des sauvegardes au bout de {{ config('studio.backup_days') }} jours.</p>

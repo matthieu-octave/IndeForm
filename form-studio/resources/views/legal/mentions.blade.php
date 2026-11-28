@@ -16,7 +16,9 @@
     <p>Directeur de la publication : {{ $p['director'] }}.</p>
 
     <h2>Hébergement</h2>
-    <p>{{ $h['name'] }}, {{ $h['address'] }} · <a href="{{ $h['website'] }}" rel="noopener">{{ $h['website'] }}</a></p>
+    <p>{{ $h['name'] }}, {{ $h['address'] }}<br>
+        Téléphone : {{ $h['phone'] }} · <a href="{{ $h['website'] }}" rel="noopener">{{ $h['website'] }}</a><br>
+        Les données sont hébergées {{ $h['data_location'] }}.</p>
 
     <h2>Propriété intellectuelle</h2>
     <p>L’application Form’Studio, sa présentation et ses modèles de séance fournis sont la propriété de {{ $p['trade_name'] }}.
