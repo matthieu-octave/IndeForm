@@ -26,6 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::get('compte/export', [AccountController::class, 'export'])->name('account.export');
     Route::delete('compte', [AccountController::class, 'destroy'])->name('account.destroy')->middleware('throttle:6,1');
 
+    Route::get('modules/ref/{reference}', [CourseModuleController::class, 'byReference'])->name('modules.byReference')->where('reference', '[^/]+');
     Route::post('modules/import', [CourseModuleController::class, 'import'])->name('modules.import');
     Route::get('modules/{module}/export', [CourseModuleController::class, 'export'])->name('modules.export');
     Route::resource('modules', CourseModuleController::class)->parameters(['modules' => 'module']);

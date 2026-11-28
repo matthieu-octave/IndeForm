@@ -74,6 +74,21 @@ class CourseModuleController extends Controller
         return redirect()->route('modules.show', $copy)->with('status', 'Copie créée : elle évolue indépendamment de l’original.');
     }
 
+    /**
+     * Ouvre un module à partir de sa référence (ex. /modules/ref/BC01-UA03), pour les liens depuis Form'Pilot.
+     * Plusieurs modules portent la référence (copies par groupe) : on affiche la bibliothèque filtrée.
+     */
+    public function byReference(string $reference): RedirectResponse
+    {
+        $matches = CourseModule::where('reference', $reference)->orderBy('title')->get(['id']);
+
+        return match ($matches->count()) {
+            0 => redirect()->route('modules.index', ['q' => $reference])->with('status', 'Aucun module avec la référence « '.$reference.' » : créez-le ou vérifiez la référence.'),
+            1 => redirect()->route('modules.show', $matches->first()),
+            default => redirect()->route('modules.index', ['q' => $reference]),
+        };
+    }
+
     public function export(CourseModule $module): Response
     {
         $name = Str::slug(($module->reference ? $module->reference.'-' : '').$module->title) ?: 'module';
