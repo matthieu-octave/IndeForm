@@ -2,36 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Workspace;
+use App\Actions\CreateAccount;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
 class AuthController extends Controller
 {
-    public function showRegister(): View
+    /** Inscription ouverte à tous, sur invitation (code), ou fermée. */
+    public static function registrationAvailable(): bool
     {
-        return view('auth.register');
+        return config('studio.registration_open') || config('studio.invite_code') !== null;
     }
 
-    public function register(Request $request): RedirectResponse
+    public function showRegister(): View
     {
-        $data = $request->validate([
+        abort_unless(self::registrationAvailable(), 404);
+
+        return view('auth.register', ['needsCode' => ! config('studio.registration_open')]);
+    }
+
+    public function register(Request $request, CreateAccount $createAccount): RedirectResponse
+    {
+        abort_unless(self::registrationAvailable(), 404);
+
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', Password::min(10)],
-        ]);
+        ];
+        if (! config('studio.registration_open')) {
+            $rules['invite_code'] = ['required', 'string', function ($attribute, $value, $fail) {
+                if (! hash_equals((string) config('studio.invite_code'), (string) $value)) {
+                    $fail('Code d’invitation incorrect.');
+                }
+            }];
+        }
+        $data = $request->validate($rules);
 
-        // Un compte = un espace de travail, créé avec le compte.
-        $user = DB::transaction(function () use ($data) {
-            $workspace = Workspace::create(['name' => 'Espace de '.$data['name']]);
-
-            return User::create($data + ['workspace_id' => $workspace->id]);
-        });
+        $user = $createAccount($data['name'], $data['email'], $data['password']);
 
         Auth::login($user);
         $request->session()->regenerate();

@@ -29,3 +29,17 @@ _À valider sur ton offre précise avant la première mise en ligne : version de
 - Configurer l'envoi d'e-mails (SMTP) : requis pour « mot de passe oublié » et la vérification d'adresse (pas encore développés).
 - Sauvegardes automatiques de la base.
 - Pages légales et RGPD (lot 5 du plan).
+
+## Inscription et comptes
+- L'inscription publique est **fermée par défaut** : `/inscription` répond 404 et le lien disparaît de la page de connexion. Les comptes existants se connectent normalement.
+- Créer un compte en SSH : `php artisan studio:create-user adresse@exemple.fr --name="Prénom Nom"` (le mot de passe est demandé, 10 caractères minimum).
+- Inviter des testeurs : `REGISTRATION_INVITE_CODE=un-code-secret` dans `.env` puis `php artisan config:cache` ; l'inscription demande alors ce code.
+- Ouvrir à tous (plus tard) : `REGISTRATION_OPEN=true`.
+
+## Leçons de la première mise en ligne (27/11/2026)
+- `mowd.fr` passe par le proxy **Cloudflare** : son certificat couvre `*.mowd.fr` mais pas un sous-domaine à deux niveaux. Utiliser un nom à **un seul niveau** (`studio-indeform.mowd.fr`), sinon erreur TLS.
+- Après création d'un sous-domaine dans N0C, attendre la coche verte du certificat Let's Encrypt (sinon Cloudflare renvoie 526).
+- Dossier racine du sous-domaine : `/home/mowdjcey/apps/form-studio-src/form-studio/public`, PHP 8.3. Composer est dans `~/bin`.
+
+## Mise à jour en une commande
+Depuis le serveur : `bash ~/apps/form-studio-src/form-studio/deploy.sh` (voir le script).
