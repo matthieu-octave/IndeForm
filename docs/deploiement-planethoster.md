@@ -43,3 +43,26 @@ _À valider sur ton offre précise avant la première mise en ligne : version de
 
 ## Mise à jour en une commande
 Depuis le serveur : `bash ~/apps/form-studio-src/form-studio/deploy.sh` (voir le script).
+
+## E-mails (mot de passe oublié)
+Envoi par la boîte `contact@mowd.fr` de PlanetHoster. Dans le `.env` du serveur :
+```
+MAIL_MAILER=smtp
+MAIL_SCHEME=smtps
+MAIL_HOST=<serveur SMTP de la boîte, affiché dans N0C > E-mails>
+MAIL_PORT=465
+MAIL_USERNAME=contact@mowd.fr
+MAIL_PASSWORD="<mot de passe de la boîte>"
+MAIL_FROM_ADDRESS=contact@mowd.fr
+MAIL_FROM_NAME="Form'Studio"
+```
+puis `php artisan config:cache`. Test : page de connexion > « Mot de passe oublié ? » avec ton adresse.
+
+## Sauvegardes de la base
+`form-studio/backup.sh` exporte la base MySQL (compressée) dans `~/backups/form-studio/` et garde 14 jours.
+Tâche cron à ajouter dans N0C (chaque nuit à 3 h) :
+```
+0 3 * * * bash /home/mowdjcey/apps/form-studio-src/form-studio/backup.sh >> /home/mowdjcey/backups/form-studio/backup.log 2>&1
+```
+Tester une fois à la main : `bash ~/apps/form-studio-src/form-studio/backup.sh`.
+Restaurer : `gunzip -c ~/backups/form-studio/FICHIER.sql.gz | mysql -u UTILISATEUR -p NOM_DE_LA_BASE`.

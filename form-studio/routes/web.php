@@ -3,13 +3,21 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseModuleController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SessionStepController;
 use App\Http\Controllers\SessionTemplateController;
 use App\Http\Controllers\TeachingSessionController;
 use Illuminate\Support\Facades\Route;
 
+Route::view('mentions-legales', 'legal.mentions')->name('legal.notice');
+Route::view('confidentialite', 'legal.privacy')->name('legal.privacy');
+
 Route::middleware('guest')->group(function () {
+    Route::get('mot-de-passe-oublie', [PasswordResetController::class, 'request'])->name('password.request');
+    Route::post('mot-de-passe-oublie', [PasswordResetController::class, 'email'])->name('password.email')->middleware('throttle:6,1');
+    Route::get('reinitialiser-mot-de-passe/{token}', [PasswordResetController::class, 'edit'])->name('password.reset');
+    Route::post('reinitialiser-mot-de-passe', [PasswordResetController::class, 'update'])->name('password.update')->middleware('throttle:6,1');
     Route::get('connexion', [AuthController::class, 'showLogin'])->name('login');
     Route::post('connexion', [AuthController::class, 'login'])->middleware('throttle:6,1');
     Route::get('inscription', [AuthController::class, 'showRegister'])->name('register');

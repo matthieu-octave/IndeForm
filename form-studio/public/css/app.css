@@ -73,3 +73,6 @@ details.template[open] > .steps,details.template[open] > .actions{margin-top:10p
 @media (max-width:600px){.timeline .time{flex-basis:56px}.head{flex-direction:column}.timer{gap:12px}}
 .tag.late{background:#fdecea;color:#b42318}
 .danger-zone{border-color:#f3c3be}
+.legal h2{margin-top:8px}.legal p,.legal ul{margin:0}.legal li{margin-bottom:4px}
+.footer{max-width:960px;margin:0 auto;padding:0 var(--gap) var(--gap);display:flex;gap:16px;flex-wrap:wrap;font-size:.85rem;color:#6c757d}
+.footer a{color:inherit}
