@@ -81,11 +81,32 @@ class TeachingSessionController extends Controller
         return redirect()->route('modules.show', $moduleId)->with('status', 'Séance supprimée.');
     }
 
-    public function present(TeachingSession $session): View
+    public function present(Request $request, TeachingSession $session): View
     {
-        $session->load('module', 'steps');
+        $session->load('module', 'steps', 'resources');
+        $start = $request->query('debut');
+        if (! is_string($start) || ! preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $start)) {
+            $start = null;
+        }
 
-        return view('sessions.present', ['session' => $session]);
+        return view('sessions.present', ['session' => $session, 'start' => $start]);
+    }
+
+    /** Enregistre les durées réellement constatées (saisies ou relevées par le chronomètre). */
+    public function saveActuals(Request $request, TeachingSession $session): RedirectResponse
+    {
+        $data = $request->validate([
+            'actual' => ['array'],
+            'actual.*' => ['nullable', 'integer', 'min:0', 'max:1440'],
+            'reset' => ['nullable', 'boolean'],
+        ]);
+
+        foreach ($session->steps as $step) {
+            $value = $request->boolean('reset') ? null : ($data['actual'][$step->id] ?? null);
+            $step->update(['actual_minutes' => $value === null || $value === '' ? null : (int) $value]);
+        }
+
+        return redirect()->back()->with('status', $request->boolean('reset') ? 'Durées réelles effacées.' : 'Durées réelles enregistrées.');
     }
 
     private function back(TeachingSession $session, ?string $status = null): RedirectResponse

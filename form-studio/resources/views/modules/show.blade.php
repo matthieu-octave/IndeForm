@@ -9,6 +9,7 @@
     </div>
     <div class="actions">
         <a class="btn" href="{{ route('modules.edit', $module) }}">Modifier</a>
+        <a class="btn" href="{{ route('modules.export', $module) }}" title="Télécharger le module (séances, déroulés, liens) au format JSON">Exporter</a>
         <form method="post" action="{{ route('modules.duplicate', $module) }}" class="inline">
             @csrf
             <input name="title" placeholder="Titre de la copie (ex. Architecture hexagonale – EADL)" size="38">
@@ -38,7 +39,9 @@
 <section class="panel" id="seance-{{ $session->id }}">
     <div class="head">
         <h2>Séance {{ $loop->iteration }} — {{ $session->title }}
-            <span class="tag muted">{{ \App\Support\Duration::format($session->steps->sum('minutes')) }}</span></h2>
+            <span class="tag muted">{{ \App\Support\Duration::format($session->steps->sum('minutes')) }}</span>
+            @php($actual = $session->actualTotalMinutes())
+            @if ($actual !== null)<span class="tag {{ $actual > $session->steps->sum('minutes') ? 'late' : '' }}" title="Durée réelle constatée">réel {{ \App\Support\Duration::format($actual) }} ({{ \App\Support\Duration::delta($actual - $session->steps->sum('minutes')) }})</span>@endif</h2>
         <div class="actions">
             <form method="post" action="{{ route('sessions.move', $session) }}" class="inline">
                 @csrf
@@ -84,6 +87,7 @@
         <li>
             <div class="grow">
                 <strong>{{ $step->title }}</strong> <span class="tag muted">{{ \App\Support\Duration::format($step->minutes) }}</span>
+                @if ($step->actual_minutes !== null && $step->actual_minutes !== $step->minutes)<span class="small {{ $step->actual_minutes > $step->minutes ? 'over' : 'under' }}">réel {{ \App\Support\Duration::format($step->actual_minutes) }}</span>@endif
                 @if ($step->instructions)<p class="pre">{{ $step->instructions }}</p>@endif
                 <details class="edit">
                     <summary>Modifier</summary>
