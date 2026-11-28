@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CourseModule;
+use App\Models\SessionTemplate;
 use App\Models\TeachingSession;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,11 +14,22 @@ class TeachingSessionController extends Controller
     public function store(Request $request, CourseModule $module): RedirectResponse
     {
         $data = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
+            'template_id' => ['nullable', 'integer'],
+            'title' => [$request->filled('template_id') ? 'nullable' : 'required', 'string', 'max:255'],
             'objectives' => ['nullable', 'string'],
         ]);
 
-        $session = $module->sessions()->create($data + [
+        if (! empty($data['template_id'])) {
+            // La règle de visibilité empêche d'utiliser le modèle personnel d'un autre compte.
+            $template = SessionTemplate::findOrFail($data['template_id']);
+            $session = $template->createSessionIn($module, $data['title'] ?? null, $data['objectives'] ?? null);
+
+            return $this->back($session, 'Séance créée depuis le modèle « '.$template->name.' » : adaptez-la librement.');
+        }
+
+        $session = $module->sessions()->create([
+            'title' => $data['title'],
+            'objectives' => $data['objectives'] ?? null,
             'position' => TeachingSession::nextPosition($module->id, 'course_module_id'),
         ]);
 

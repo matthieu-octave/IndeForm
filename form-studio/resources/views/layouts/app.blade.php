@@ -12,6 +12,7 @@
     <nav>
         @auth
             <a href="{{ route('modules.index') }}">Bibliothèque</a>
+            <a href="{{ route('templates.index') }}">Modèles de séance</a>
             <form method="post" action="{{ route('logout') }}" class="inline">@csrf
                 <button class="linkbtn">{{ auth()->user()->name }} · Se déconnecter</button></form>
         @endauth

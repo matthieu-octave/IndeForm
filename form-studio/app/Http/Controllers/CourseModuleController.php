@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CourseModule;
+use App\Models\SessionTemplate;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -38,6 +39,7 @@ class CourseModuleController extends Controller
 
         return view('modules.show', [
             'module' => $module,
+            'templates' => SessionTemplate::orderByRaw('workspace_id is not null')->orderBy('name')->get(),
             'otherModules' => CourseModule::whereKeyNot($module->id)->orderBy('title')->get(['id', 'title']),
         ]);
     }
